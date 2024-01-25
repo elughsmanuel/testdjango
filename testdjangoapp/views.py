@@ -57,12 +57,12 @@ def product_new(request):
             else:
                 return JsonResponse({
                     'success': True,
-                    'error': 'Invalid data',
+                    'data': 'Invalid data',
                 }, status=400)
         except json.JSONDecodeError:
             return JsonResponse({
-                'success': True,
-                'error': 'Invalid JSON data',
+                'success': False,
+                'data': 'Invalid JSON data',
             }, status=400)
 
 @csrf_exempt
@@ -82,22 +82,21 @@ def product_edit(request, pk):
                 })
             else:
                 return JsonResponse({
-                    'success': True,
-                    'error': 'Invalid data',
+                    'success': False,
+                    'data': 'Invalid data',
                 }, status=400)
         except json.JSONDecodeError:
             return JsonResponse({
-                'success': True,
-                'error': 'Invalid JSON data',
+                'success': False,
+                'data': 'Invalid JSON data',
             }, status=400)
-
 
 @csrf_exempt
 def product_delete(request, pk):
     if request.method == 'DELETE':
         product = Product.objects.get(pk=pk)
         product.delete()
-        
+
         return JsonResponse({
             'status': True,
             'data': 'Product successfully deleted',
