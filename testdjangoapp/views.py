@@ -1,50 +1,85 @@
-from django.shortcuts import render
-
-# Create your views here.
 import json
+
+from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import Item
-from .forms import ItemForm
+from .models import Product
+from .forms import ProductForm
 
 @csrf_exempt
-def item_list(request):
+def product_list(request):
     if request.method == 'GET':
-        items = Item.objects.all()
-        data = [{'id': item.id, 'name': item.name, 'description': item.description} for item in items]
-        return JsonResponse({'items': data}, safe=False)
+        products = Product.objects.all()
+        data = [{
+            'id': product.id, 
+            'name': product.name, 
+            'description': product.description,
+            'price': product.price,
+            'category': product.category,
+            'quantity': product.quantity,
+            'created_at': product.created_at,
+            'updated_at': product.updated_at,
+        } for product in products]
+        return JsonResponse({'products': data}, safe=False)
 
 @csrf_exempt
-def item_detail(request, pk):
+def product_detail(request, pk):
     if request.method == 'GET':
-        item = Item.objects.get(pk=pk)
-        data = {'id': item.id, 'name': item.name, 'description': item.description}
+        product = Product.objects.get(pk=pk)
+        data = {
+            'id': product.id, 
+            'name': product.name, 
+            'description': product.description,
+            'price': product.price,
+            'category': product.category,
+            'quantity': product.quantity,
+            'created_at': product.created_at,
+            'updated_at': product.updated_at,
+        }
         return JsonResponse(data)
 
 @csrf_exempt
-def item_new(request):
+def product_new(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            form = ItemForm(data)
+            form = ProductForm(data)
             if form.is_valid():
-                item = form.save()
-                return JsonResponse({'id': item.id, 'name': item.name, 'description': item.description})
+                product = form.save()
+                return JsonResponse({
+                    'id': product.id, 
+                    'name': product.name, 
+                    'description': product.description,
+                    'price': product.price,
+                    'category': product.category,
+                    'quantity': product.quantity,
+                    'created_at': product.created_at,
+                    'updated_at': product.updated_at,
+                })
             else:
                 return JsonResponse({'error': 'Invalid data'}, status=400)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
 
 @csrf_exempt
-def item_edit(request, pk):
+def product_edit(request, pk):
     if request.method == 'PUT':
-        item = Item.objects.get(pk=pk)
+        product = Product.objects.get(pk=pk)
         try:
             data = json.loads(request.body)
-            form = ItemForm(data, instance=item)
+            form = ProductForm(data, instance=product)
             if form.is_valid():
-                item = form.save()
-                return JsonResponse({'id': item.id, 'name': item.name, 'description': item.description})
+                product = form.save()
+                return JsonResponse({
+                    'id': product.id, 
+                    'name': product.name, 
+                    'description': product.description,
+                    'price': product.price,
+                    'category': product.category,
+                    'quantity': product.quantity,
+                    'created_at': product.created_at,
+                    'updated_at': product.updated_at,
+                })
             else:
                 return JsonResponse({'error': 'Invalid data'}, status=400)
         except json.JSONDecodeError:
@@ -52,8 +87,8 @@ def item_edit(request, pk):
 
 
 @csrf_exempt
-def item_delete(request, pk):
+def product_delete(request, pk):
     if request.method == 'DELETE':
-        item = Item.objects.get(pk=pk)
-        item.delete()
-        return JsonResponse({'message': 'Item deleted successfully'})
+        product = Product.objects.get(pk=pk)
+        product.delete()
+        return JsonResponse({'message': 'Product successfully deleted'})
