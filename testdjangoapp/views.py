@@ -10,7 +10,7 @@ from .forms import ProductForm
 def product_list(request):
     if request.method == 'GET':
         products = Product.objects.all()
-        data = [{
+        product_data = [{
             'id': product.id, 
             'name': product.name, 
             'description': product.description,
@@ -20,13 +20,17 @@ def product_list(request):
             'created_at': product.created_at,
             'updated_at': product.updated_at,
         } for product in products]
-        return JsonResponse({'products': data}, safe=False)
+
+        return JsonResponse({
+            'success': True,
+            'data': product_data,
+        }, safe=False)
 
 @csrf_exempt
 def product_detail(request, pk):
     if request.method == 'GET':
         product = Product.objects.get(pk=pk)
-        data = {
+        product_data = {
             'id': product.id, 
             'name': product.name, 
             'description': product.description,
@@ -36,7 +40,10 @@ def product_detail(request, pk):
             'created_at': product.created_at,
             'updated_at': product.updated_at,
         }
-        return JsonResponse(data)
+        return JsonResponse({
+            'success': True,
+            'data': product_data,
+        })
 
 @csrf_exempt
 def product_new(request):
@@ -46,7 +53,7 @@ def product_new(request):
             form = ProductForm(data)
             if form.is_valid():
                 product = form.save()
-                return JsonResponse({
+                product_data = {
                     'id': product.id, 
                     'name': product.name, 
                     'description': product.description,
@@ -55,11 +62,21 @@ def product_new(request):
                     'quantity': product.quantity,
                     'created_at': product.created_at,
                     'updated_at': product.updated_at,
+                }
+                return JsonResponse({
+                        'success': True,
+                        'data': product_data,
                 })
             else:
-                return JsonResponse({'error': 'Invalid data'}, status=400)
+                return JsonResponse({
+                    'success': True,
+                    'error': 'Invalid data',
+                }, status=400)
         except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+            return JsonResponse({
+                'success': True,
+                'error': 'Invalid JSON data',
+            }, status=400)
 
 @csrf_exempt
 def product_edit(request, pk):
@@ -70,7 +87,7 @@ def product_edit(request, pk):
             form = ProductForm(data, instance=product)
             if form.is_valid():
                 product = form.save()
-                return JsonResponse({
+                product_data = {
                     'id': product.id, 
                     'name': product.name, 
                     'description': product.description,
@@ -79,11 +96,21 @@ def product_edit(request, pk):
                     'quantity': product.quantity,
                     'created_at': product.created_at,
                     'updated_at': product.updated_at,
+                }
+                return JsonResponse({
+                        'success': True,
+                        'data': product_data,
                 })
             else:
-                return JsonResponse({'error': 'Invalid data'}, status=400)
+                return JsonResponse({
+                    'success': True,
+                    'error': 'Invalid data',
+                }, status=400)
         except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+            return JsonResponse({
+                'success': True,
+                'error': 'Invalid JSON data',
+            }, status=400)
 
 
 @csrf_exempt
@@ -91,4 +118,7 @@ def product_delete(request, pk):
     if request.method == 'DELETE':
         product = Product.objects.get(pk=pk)
         product.delete()
-        return JsonResponse({'message': 'Product successfully deleted'})
+        return JsonResponse({
+            'status': True,
+            'data': 'Product successfully deleted',
+        })
